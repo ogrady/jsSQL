@@ -1,0 +1,57 @@
+<html>
+<head>
+    <script src="util.js"></script>
+    <script src="object.js"></script>
+    <script src="generator.js"></script>
+    <script src="algebra.js"></script>
+    <script src="logic.js"></script>
+    <script src="parser.js"></script>
+    <script src="unittests.js"></script>
+</head>
+<body>
+    <script>
+    var persons = new Relation("Persons", [
+        new Tuple({"pid": 1, "name": "bob", "age": 14}), 
+        new Tuple({"pid": 2, "name": "alice", "age": 32})
+    ]);
+
+
+    var persons2 = new Relation("Persons2", [
+        new Tuple({"pid": 1, "name": "cob", "age": 4}), 
+        new Tuple({"pid": 2, "name": "alice", "age": 32})
+    ]);
+
+    var orders = new Relation("Orders", [
+        new Tuple({"ordered_by": 1, "total_value": 1000}), 
+        new Tuple({"ordered_by": 1, "total_value": 1000}),
+        new Tuple({"ordered_by": 2, "total_value": 10}),
+        new Tuple({"ordered_by": 1, "total_value": 5000}),
+        new Tuple({"ordered_by": 2, "total_value": 42}),
+        new Tuple({"ordered_by": 2, "total_value": 10}),
+        new Tuple({"ordered_by": 1, "total_value": 10}),
+    ]);
+
+
+    var groupById = new GroupBy(function(t) { 
+        return t.get("ordered_by");
+    } );
+
+
+    var joinById = new EquiJoin(
+        function(t) { return t.get("pid"); },
+        function(t) { return t.get("ordered_by"); }
+    );
+
+    var union = new Union();
+    var intersect = new Intersection();
+
+    var obj1 = new Tuple({x: 1, name: "alice"});
+    var obj2 = new Tuple({x: 1, name: "alice"});
+    
+    // console.log(groupById.execute(joinById.execute(persons, orders)));
+
+    // console.log(union.execute(persons, orders));
+    // console.log("Intersect", intersect.execute(persons, persons2));
+    </script>
+</body>
+</html>
