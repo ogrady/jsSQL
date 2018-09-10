@@ -111,7 +111,7 @@ function NestedLoopGenerator() {
     };
 
     this.next = function() {
-        var res = [this.xs[this.i], this.ys[this.j]];
+        let res = [this.xs[this.i], this.ys[this.j]];
         this.j = (this.j + 1) % this.ys.length;
         if(this.j == 0) {
             this.i++;

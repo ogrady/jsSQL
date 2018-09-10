@@ -32,6 +32,12 @@ function Relation(name = "", schema = []) {
         }
         return matches;
     };
+
+    this.pushTuple = function(t) {
+        t.index = this.tuples.length;
+        t.addHeritage(this);
+        this.tuples.push(t);
+    };
     
     this.addTuples = function(ts) {
         ts.forEach(function(t) { this.addTuple(t) }, this);
@@ -42,22 +48,19 @@ function Relation(name = "", schema = []) {
         if(!this.matchesSchema(t)) {
             throw "Tuple doesn't match schema. Tuple: " + Object.keys(t.data) + " Schema: " + this.schema ;
         }
-        this.tuples.push(t);
-        t.addHeritage(this);
+        this.pushTuple(t);
     }
 
     this.createFromRows = function(data) {
         console.log("WARNING", "object.Relation.createFromRows is a deprecated function and should only be used for testing");
         for(var i = 0; i < data.length; i++) {
-            var t = new Tuple(data[i]);
-            this.tuples.push(t);
-            t.addHeritage(this);
+            this.pushTuple(new Tuple(data[i]));
         }
     };
     
     this._forceTuples = function(ts) {
         console.log("WARNING", "object.Relation._forceTuples is an evil function that bypasses schema checking and should only be used for testing");
-        ts.forEach(function(t) { this.tuples.push(t); t.addHeritage(this); }, this);
+        ts.forEach(function(t) { this.pushTuple(t); }, this);
     };
     
     this.createFromColumns = function(data) {
@@ -72,9 +75,7 @@ function Relation(name = "", schema = []) {
             this.schema.forEach(function(k) { 
                 d[k] = data[k][i];
             }, this);
-            var t = new Tuple(d);
-            this.tuples.push(t);
-            t.addHeritage(this);
+            this.pushTuple(new Tuple(d));
         }
     };
     
@@ -110,6 +111,7 @@ function Tuple(data, heritage = []) {
     U.assertType(heritage   , Array);
     this.id = NEXT_TID++;
     this.data = data;
+    this.index = -1;
     this.hash = undefined;
     this.heritage = heritage;
 
