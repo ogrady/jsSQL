@@ -144,7 +144,7 @@ function Tuple(data, heritage = []) {
     /**
      * Generates and caches a hash for this tuples.
      * Note that the order of the data is relevant for the hash.
-     * So Tuple({x:1, y:2}).getHash() !== Tuple({y:2, x1}) !!
+     * So Tuple({x:1, y:2}).getHash() !== Tuple({y:2, x1}).getHash() !!
      * 
      * @return {int} The hash for this Tuple.
      */
