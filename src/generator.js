@@ -123,3 +123,11 @@ function NestedLoopGenerator() {
         return this.i < this.xs.length && this.j < this.ys.length;
     };
 }
+
+module.exports = {
+    Generator: Generator, 
+    LinearGenerator: LinearGenerator,
+    // FunnelGenerator: FunnelGenerator,
+    BiFunnelGenerator: BiFunnelGenerator,
+    NestedLoopGenerator: NestedLoopGenerator
+};

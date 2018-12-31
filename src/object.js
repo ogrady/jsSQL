@@ -163,3 +163,9 @@ function Tuple(data, heritage = []) {
         return this.hash;
     };
 }
+
+module.exports = {
+    Factory: Factory,
+    Relation: Relation,
+    Tuple: Tuple
+};

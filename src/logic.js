@@ -50,3 +50,11 @@ function Or(ps) {
         return match;
     };
 }
+
+module.exports = {
+    Predicate: Predicate,
+    Not: Not,
+    // Conjunction: Conjunction,
+    And: And,
+    Or: Or
+};

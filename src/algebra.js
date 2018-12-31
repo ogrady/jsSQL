@@ -94,7 +94,6 @@ function Operation(gen) {
     };
 }
 
-
 /**
 * Unary Operations are Operation that receive exactly one operand.
 */
@@ -778,3 +777,25 @@ function RightSemiJoin(getA, getB) {
         return inp1.name+"⋊"+inp2.name;
     };
 }
+
+module.exports = {
+    Operation: Operation,
+    UnaryOperation: UnaryOperation,
+    BinaryOperation: BinaryOperation,
+    GroupBy: GroupBy,
+    Projection: Projection,
+    Restriction: Restriction,
+    Distinct: Distinct,
+    OrderBy: OrderBy,
+    Union: Union,
+    Intersection: Intersection,
+    Without: Without,
+    CrossProduct: CrossProduct,
+    EquiJoin: EquiJoin,
+    NaturalJoin: NaturalJoin,
+    LeftJoin: LeftJoin,
+    RightJoin: RightJoin,
+    FullOuterJoin: FullOuterJoin,
+    LeftSemiJoin: LeftSemiJoin,
+    RightSemiJoin: RightSemiJoin
+};

@@ -131,3 +131,7 @@ Array.prototype.stableSort = function(cmp) {
     }
     return this;
 };
+
+module.exports = {
+    U: U
+};

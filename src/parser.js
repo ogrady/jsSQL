@@ -165,3 +165,7 @@ function RelationalAlgebraLexer() {
         return token;
     }
 }
+
+module.exports = {
+    RelationalAlgebraLexer: RelationalAlgebraLexer
+};
