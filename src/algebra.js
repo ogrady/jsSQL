@@ -55,7 +55,7 @@ function Operation(gen) {
      *                     Arity of this function is set by the implementing Operator.
      * @param {Relation} inp.. All input relations, as they have to be known in some cases
      *                         to derive the schema of the final result.
-     *                         
+     *                          
      */
     this.deriveSchema = function() {
         throw "Not implemented";

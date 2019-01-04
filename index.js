@@ -17,14 +17,17 @@ console.log(object);
 console.log(parser);
 */
 
-var l = new parser.RelationalAlgebraLexer();
-var p = new parser.RelationalAlgebraParser();
+var l = new parser.RA.Lexer();
+var p = new parser.RA.Parser();
+var v = new parser.RA.Evaluator();
 let input = "A.x ≠ B";
 input = "A.x ⋉ B";
+input = "A ⋉{A.x = B.y} B";
 console.log(input);
 let lexd = l.lex(input);
 let parsed = p.parse(lexd);
 console.log(parsed);
+console.log(v.visit(parsed));
 
 module.exports = {
     algebra: algebra,

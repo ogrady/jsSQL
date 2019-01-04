@@ -1,5 +1,6 @@
 "use strict";
 const { U } = require("./util.js");
+const Algebra = require("./algebra.js");
 
 // CONSTANTS
 
@@ -8,49 +9,59 @@ const { U } = require("./util.js");
 // use to lookup the constructor name. This saves us a huge switch-case,
 // but requires a proper naming schema.
 // We are using T._Inverted and RA._LowerCase for that. 
+
+function Symbol(symbol, precedence, leftAssociative) {
+    this.symbol = symbol;
+    this.precedence = precedence;
+    this.leftAssociative = leftAssociative;
+}
+
 var T = {
-    OPARAN : "(",
-    CPARAN : ")",
-    OCURLY: "{",
-    CCURLY: "}",
-    QUOTE : "'",
-    SELECT : "σ",
-    PROJECT : "π",
-    UNION : "∪",
-    INTERSECTION : "∩",
-    WITHOUT : "−",
-    CROSSPRODUCT : "✕",
-    RENAME : "ρ",
+    OPARAN :       new Symbol("(",  100, false),
+    CPARAN :       new Symbol(")",  100, false),
+    OCURLY:        new Symbol("{",  100, false),
+    CCURLY:        new Symbol("}",  100, false),
+    OBRACKET:      new Symbol("[",  100, false),
+    CBRACKET:      new Symbol("]",  100, false),
+    QUOTE :        new Symbol("'",  100, false),
+    SELECT :       new Symbol("σ",    1, false),
+    PROJECT :      new Symbol("π",    1, false),
+    UNION :        new Symbol("∪",    1, false),
+    INTERSECTION : new Symbol("∩",    1, false),
+    WITHOUT :      new Symbol("\\", 100, false),
+    CROSSPRODUCT : new Symbol("×",  100, false),
+    RENAME :       new Symbol("ρ",    1, false),
     // DIVISION : "÷",
-    JOIN : "⋈",
-    LOJOIN : "⟕",
-    ROJOIN : "⟖",
-    FOJOIN : "⟗",
-    LSJOIN : "⋉",
-    RSJOIN : "⋊",
-    AND : "∧",
-    OR : "∨",
-    NOT : "¬",
-    GT: ">",
-    GTE : "≥",
-    LT: "<",
-    LTE : "≤",
-    NEQ : "≠",
-    EQ : "≡",
-    EXISTS : "∃",
-    ALL : "∀",
+    JOIN :         new Symbol("⋈",    1, false),
+    LOJOIN :       new Symbol("⟕",   1, false),
+    ROJOIN :       new Symbol("⟖",   1, false),
+    FOJOIN :       new Symbol("⟗",   1, false),
+    LSJOIN :       new Symbol("⋉",    1, false),
+    RSJOIN :       new Symbol("⋊",    1, false),
+    AND :          new Symbol("∧",  100, false),
+    OR :           new Symbol("∨",  100, false),
+    NOT :          new Symbol("¬",  100, false),
+    GT:            new Symbol(">",  100, false),
+    GTE :          new Symbol("≥",  100, false),
+    LT:            new Symbol("<",  100, false),
+    LTE :          new Symbol("≤",  100, false),
+    NEQ :          new Symbol("≠",  100, false),
+    EQ :           new Symbol("≡",  100, false),
+    EXISTS :       new Symbol("∃",  100, false),
+    ALL :          new Symbol("∀",  100, false),
+    MINUS :        new Symbol("-",   25, false),
+    PLUS :         new Symbol("+",   25, false),
+    TIMES :        new Symbol("*",   50, false),
+    DIVIDED_BY :   new Symbol("/",   50, false),
+    PERIOD :       new Symbol(".",   75, false),
+    COMMA:         new Symbol(",",  100, false),
+    UNDERSCORE :   new Symbol("_",  100, false),
     DIGITS : [1,2,3,4,5,6,7,8,9,0],
     DIGITS_S : "1234567890",
-    MINUS : "-",
-    PLUS : "+",
-    TIMES : "*",
-    DIVIDED_BY : "/",
-    PERIOD : ".",
-    UNDERSCORE : "_",
 };
 
-T.PREFIX_OPERATORS = [T.SELECT, T.PROJECT, T.RENAME, T.MINUS, T.EXISTS, T.ALL],
-T.INFIX_OPERATORS = [T.UNION, T.INTERSECTION, T.WITHOUT, T.CROSSPRODUCT, T.JOIN, T.LOJOIN, T.ROJOIN, T.FOJOIN, T.LSJOIN, T.RSJOIN, T.AND, T.OR, T.GT, T.GTE, T.LT, T.LTE, T.NEQ, T.EQ, T.PLUS, T.MINUS, T.TIMES, T.DIVIDED_BY, T.PERIOD]
+T.PREFIX_OPERATORS = [T.SELECT, T.PROJECT, T.RENAME, T.MINUS, T.EXISTS, T.ALL];
+T.INFIX_OPERATORS = [T.UNION, T.INTERSECTION, T.WITHOUT, T.CROSSPRODUCT, T.JOIN, T.LOJOIN, T.ROJOIN, T.FOJOIN, T.LSJOIN, T.RSJOIN, T.AND, T.OR, T.GT, T.GTE, T.LT, T.LTE, T.NEQ, T.EQ, T.PLUS, T.MINUS, T.TIMES, T.DIVIDED_BY, T.PERIOD];
 T._Inverted = Object.keys(T).reduce((acc, el) => {acc[T[el]] = el; return acc; }, {});
 
 
@@ -88,6 +99,7 @@ function TSpecial(value, lineNumber, colNumber) {
 
 // AST NODES
 // abstract
+
 function ASTNode() {
 }
 
@@ -137,6 +149,11 @@ const RA = {
         this.right = right;
     },
 
+    Join: function(left, right, on) {
+        RA.BinaryOperation.call(this, left, T.JOIN, right, on);   
+        this.on = on;
+    },
+
     Projection: function(expression, relation) {
         RA.BinaryOperation.call(this, expression, T.PROJECT, relation);
     },
@@ -161,24 +178,20 @@ const RA = {
         RA.BinaryOperation.call(this, left, T.CROSSPRODUCT, right);   
     },
 
-    Join: function(left, right) {
-        RA.BinaryOperation.call(this, left, T.JOIN, right);   
+    LOJoin: function(left, right, on) {
+        RA.Join.call(this, left, T.LOJOIN, right, on);   
     },
 
-    LOJoin: function(left, right) {
-        RA.BinaryOperation.call(this, left, T.LOJOIN, right);   
+    ROJoin: function(left, right, on) {
+        RA.Join.call(this, left, T.ROJOIN, right, on);   
     },
 
-    ROJoin: function(left, right) {
-        RA.BinaryOperation.call(this, left, T.ROJOIN, right);   
-    },
-
-    LSJoin: function(left, right) {
-        RA.BinaryOperation.call(this, left, T.LSJOIN, right);   
+    LSJoin: function(left, right, on) {
+        RA.Join.call(this, left, T.LSJOIN, right, on);   
     },
 
     RSJoin: function(left, right) {
-        RA.BinaryOperation.call(this, left, T.RSJOIN, right);   
+        RA.Join.call(this, left, T.RSJOIN, right, on);   
     },
 
     And: function(left, right) {
@@ -218,6 +231,7 @@ const RA = {
     }
 };
 RA._LowerCase = Object.keys(RA).reduce((acc, el) => { acc[el.toLowerCase()] = RA[el]; return acc; }, {});
+
 
 // abstract
 function Lexer() {
@@ -287,18 +301,18 @@ function Lexer() {
     };
     
     this._lexString = function() {
-        this._expect(T.QUOTE);
-        var t = this._eatWhile((c => c !== T.QUOTE));
-        this._expect(T.QUOTE);
+        this._expect(T.QUOTE.symbol);
+        var t = this._eatWhile((c => c !== T.QUOTE.symbol));
+        this._expect(T.QUOTE.symbol);
         return t;
     };
     
     this._lexNumber = function() {
-        var integer = parseInt(this._eatWhile(c => T.DIGITS_S.indexOf(c) > -1));
+        var integer = parseInt(this._eatWhile(c => c in T.DIGITS));
         var decimal = 0;
-        if(this._peek(T.PERIOD)) {
-            this._expect(T.PERIOD);
-            decimal = parseInt(this._eatWhile(c => T.DIGITS_S.indexOf(c) > -1));
+        if(this._peek(T.PERIOD.symbol)) {
+            this._expect(T.PERIOD.symbol);
+            decimal = parseInt(this._eatWhile(c => c in T.DIGITS));
         }
         return parseFloat("" + integer + "." + decimal);
     };
@@ -308,8 +322,29 @@ function Lexer() {
         // but lex() should only jump here if the very first character is an underscore
         // or a character!
         U.assert(!U.isDigit(this.input[0]));
-        return this._eatWhile(c => U.isAlpha(c) || U.isDigit(c) || c === T.UNDERSCORE);
+        return this._eatWhile(c => U.isAlpha(c) || U.isDigit(c) || c === T.UNDERSCORE.symbol);
     };
+}
+
+function RelationalAlgebraLexer() {
+    Lexer.call(this);
+    
+    this._lex = function() {
+        let c = this.input[0];
+        let token = undefined;
+        if(c === T.UNDERSCORE.symbol || U.isAlpha(c)) {
+            token = new TIdent(this._lexIdent());
+        } else if(c === T.QUOTE.symbol) {
+            token = new TString(this._lexString());
+        } else if(c in T.DIGITS) {
+            token = new TNumber(this._lexNumber());
+        } else {
+            let t = this.input[0];
+            this._expect(t);
+            token = new TSpecial(t);
+        }
+        return token;
+    }
 }
 
 // abstract
@@ -324,14 +359,14 @@ function Parser() {
 
     this._expectType = function(expectedType) {
         if(!this._peekType(expectedType)) {
-            throw "Expected value of type '" + expectedType + "', but found '" + typeof t + "'";
+            throw "Expected value of type '" + expectedType + "', but found '" + typeof this.input[0] + "'";
         }
         return this.input.shift();
     };
 
     this._expectValue = function(expectedValue) {
         if(!this._peekValue(expectedValue)) {
-            throw "Expected value '" + expectedValue + "', but found '" + t.value + "'";
+            throw "Expected value '" + expectedValue + "', but found '" + this.input[0].value + "'";
         }
         return this.input.shift();
     };
@@ -346,36 +381,15 @@ function Parser() {
     };
 }
 
-function RelationalAlgebraLexer() {
-    Lexer.call(this);
-    
-    this._lex = function() {
-        var c = this.input[0];
-        var token = undefined;
-        if(c === T.UNDERSCORE || U.isAlpha(c)) {
-            token = new TIdent(this._lexIdent());
-        } else if(c === T.QUOTE) {
-            token = new TString(this._lexString());
-        } else if(T.DIGITS_S.indexOf(c) > -1) {
-            token = new TNumber(this._lexNumber());
-        } else {
-            var t = this.input[0];
-            this._expect(t);
-            token = new TSpecial(t);
-        }
-        return token;
-    }
-}
-
 function RelationalAlgebraParser() {
     Parser.call(this);
 
     this._isPrefixOperator = function() {
-        return this.input.length > 0 && U.indefOf(this.input[0].value, T.PREFIX_OPERATORS) > -1;
+        return this.input.length > 0 && this.input[0].value in T.PREFIX_OPERATORS;
     };
 
     this._isInfixOperator = function() {
-        return this.input.length > 0 && U.indexOf(this.input[0].value, T.INFIX_OPERATORS) > -1;
+        return this.input.length > 0 && this.input[0].value in T.INFIX_OPERATORS;
     };
 
     this._parse = function() {
@@ -386,12 +400,16 @@ function RelationalAlgebraParser() {
         let res = this._parseTerminal();
         if(this._isInfixOperator()) {
             let op = this.input.shift().value;
+            let subscript = this._peekValue(T.OCURLY.symbol) ? this._parseSubscript() : undefined;
+            if(this.input.length === 0) {
+                throw "Expected right hand side of infix operator " + op + ", but input ended.";
+            }
             let rhs = this._parseExpression();
             let constructor = RA._LowerCase[T._Inverted[op].toLowerCase()];
             if(constructor === undefined) {
                 throw "Unknown operator " + op;
             }
-            res = new constructor(res, rhs);
+            res = new constructor(res, rhs, subscript);
         }
         return res;
     };
@@ -400,11 +418,18 @@ function RelationalAlgebraParser() {
         let ident = new RA.Ident(this._parseIdent());
     };
 
+    this._parseSubscript = function() {
+        this._expectValue(T.OCURLY.symbol);
+        let sub = this._parseExpression();
+        this._expectValue(T.CCURLY.symbol);
+        return sub;
+    };
+
     this._parseTerminal = function() {
         var res = undefined;
         if(this._peekType(TNumber)) {
             res = this._parseNumber();
-        } else if(this._peekValue(T.QUOTE)) {
+        } else if(this._peekType(TString)) {
             res = this._parseString();
         } else if(this._peekType(TIdent)) {
             res = this._parseIdent();    
@@ -416,44 +441,87 @@ function RelationalAlgebraParser() {
 
     this._parseNumber = function() {
         let nr = this._expectType(TNumber);
-        if(this._peekValue(T.PERIOD)) {
-            this._expectValue(T.PERIOD);
+        if(this._peekValue(T.PERIOD.symbol)) {
+            this._expectValue(T.PERIOD.symbol);
             let decimal = this._expectType(TNumber);
-            res = new RA.Float(nr); // FIXME: append decimal
+            res = new RA.Float(parseFloat(nr + "." + decimal));
         } else {
             res = new RA.Integer(nr);
         }
     };
 
     this._parseString = function() {
-        this._expectValue(T.QUOTE);
+        this._expectValue(T.QUOTE.symbol);
         res = new RAString(this._expectType(TString));
-        this._expectValue(T.QUOTE);
+        this._expectValue(T.QUOTE.symbol);
     };
 
     this._parseIdent = function() {
         let res = new RA.Ident(this._expectType(TIdent).value);
-        if(this._peekValue(T.PERIOD)) {
-            this._expectValue(T.PERIOD);
+        if(this._peekValue(T.PERIOD.symbol)) {
+            this._expectValue(T.PERIOD.symbol);
             let attr = new RA.Ident(this._expectType(TIdent).value);
             res = new RA.Attribute(res, attr);
         }
         return res;
     };
 
+    this._parseList = function() {
+        let els = []
+        this._expectValue(T.OBRACKET.symbol)
+        while(!this._peekValue(T.CCURLY.symbol)) {
+            els.push(new RA.Ident(this._expectType(TIdent)).value)
+            if(this._peekValue(T.COMMA.symbol)) {
+                this._expectValue(T.COMMA.symbol);
+            }
+        }
+        this._expectValue(T.CBRACKET.symbol);
+    }
+
+    // π{name,age}(...)
+    // new Projection(["name", "age"])
     this._parseProjection = function() {
-        this._expectValue(T.PROJECT);
-        this._expectValue(T.OCURLY);
-        let exp = this._parsePredicate();
-        this._expectValue(T.CCURLY);
-        this._expectValue(T.OPARAN);
+        this._expectValue(T.PROJECT.symbol);
+        let fields = this._parseList();
         let ident = this._parseIdent();
-        this._expectValue(T.CPARAN);
-        return new RAProjection(exp, ident);
+        this._expectValue(T.CPARAN.symbol);
+        return new RAProjection(list, ident);
+    };
+}
+
+function Visitor() {
+    this.visit = function(node) {
+        let fname = "visit_" + node.constructor.name;
+        (fname in this ? this[fname].bind(this) : this.visit_default)(node);
+    };
+
+    this.visit_default = function(node) {
+        throw "Visitor not suited for node of type " + node.constructor.name;
+    };
+}
+
+function RelationalAlgebraEvaluator() {
+    Visitor.call(this);
+
+    this.visit_LSJoin = function(join) {
+        let lhs = this.visit(join.left);
+        let rhs = this.visit(join.right);
+        new Algebra.LeftJoin()
+    };
+
+    this.visit_Attribute = function(attr) {
+        return 1;
+    };
+
+    this.visit_Ident = function(attr) {
+        return 1;
     };
 }
 
 module.exports = {
-    RelationalAlgebraLexer: RelationalAlgebraLexer,
-    RelationalAlgebraParser: RelationalAlgebraParser
+    RA: {
+        Lexer: RelationalAlgebraLexer,
+        Parser: RelationalAlgebraParser,
+        Evaluator: RelationalAlgebraEvaluator
+    }  
 };
