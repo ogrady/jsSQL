@@ -785,6 +785,7 @@ module.exports = {
     GroupBy: GroupBy,
     Projection: Projection,
     Restriction: Restriction,
+    Rename: Rename,
     Distinct: Distinct,
     OrderBy: OrderBy,
     Union: Union,

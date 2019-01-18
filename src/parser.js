@@ -130,6 +130,12 @@ const RA = {
         this.child = child;
     },
 
+    Alias: function(oldName, newName) {
+        RA.Expression.call(this);
+        this.oldName = oldName; 
+        this.newName = newName;
+    },
+
     BinaryOperation: function(left, op, right) {
         RA.Expression.call(this);
         this.left = left;
@@ -143,6 +149,10 @@ const RA = {
 
     Selection: function(expression, relation) {
         RA.BinaryOperation.call(this, expression, T.SELECT, relation);
+    },
+
+    Rename: function(expression, relation) {
+        RA.BinaryOperation.call(this, expression, T.RENAME, relation);
     },
 
     Union: function(left, right) {

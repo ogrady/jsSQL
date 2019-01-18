@@ -1,5 +1,5 @@
 {
-  "name": "js-sql-eval",
+  "name": "@ogradyd/jssql",
   "version": "1.0.0",
   "description": "Implementation of relational algebra and SQL constructs in Javascript",
   "main": "index.js",
