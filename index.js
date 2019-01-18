@@ -1,9 +1,9 @@
-const algebra = require("./src/algebra.js");
-const generator = require("./src/generator.js");
-const logic = require("./src/logic.js");
-const object = require("./src/object.js");
+const algebra = require("./evaluator/algebra.js");
+const generator = require("./evaluator/generator.js");
+const logic = require("./evaluator/logic.js");
+const object = require("./evaluator/object.js");
 
-const parser = require("./src/parser.js");
+const parser = require("./evaluator/parser.js");
 
 exports.printMsg = function() {
   console.log("This is a message from the demo package");
@@ -17,14 +17,17 @@ console.log(object);
 console.log(parser);
 */
 
-var l = new parser.RelationalAlgebraLexer();
-var p = new parser.RelationalAlgebraParser();
+var l = new parser.RA.Lexer();
+var p = new parser.RA.Parser();
+var v = new parser.RA.Evaluator();
 let input = "A.x ≠ B";
 input = "A.x ⋉ B";
+input = "A ⋉{A.x = B.y} B";
 console.log(input);
 let lexd = l.lex(input);
 let parsed = p.parse(lexd);
 console.log(parsed);
+console.log(v.visit(parsed));
 
 module.exports = {
     algebra: algebra,
