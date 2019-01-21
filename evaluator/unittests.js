@@ -7,7 +7,7 @@ const {
     BinaryOperation,
     GroupBy,
     Projection,
-    Restriction,
+    Selection,
     Rename,
     Distinct,
     OrderBy,
@@ -253,19 +253,19 @@ function TestSuite() {
         U.expect(actual, expected, "Projection");
     };
     
-    this.ut_restriction = function() {
-        var op = new Restriction(
+    this.ut_selection = function() {
+        var op = new Selection(
                 new Predicate(function(t) { return t.get("x") > 2 } )
         );
         var expected = Factory.createRelationFromTuples("", [
             new Tuple({"char": "a", "x": 3}),
         ]);
         var actual = this.executeOp(op, UTData.chars);
-        U.expect(actual, expected, "Restriction");
+        U.expect(actual, expected, "Selection");
     };
     
-    this.ut_restrictionOr = function() {
-        var op = new Restriction(
+    this.ut_selectionOr = function() {
+        var op = new Selection(
             new Or([
                 new Predicate(function(t) { return t.get("char") === "c" } ),
                 new Predicate(function(t) { return t.get("x") > 2 } )
@@ -276,11 +276,11 @@ function TestSuite() {
             new Tuple({"char": "a", "x": 3}),
         ]);
         var actual = this.executeOp(op, UTData.chars);
-        U.expect(actual, expected, "Restriction Or");
+        U.expect(actual, expected, "Selection Or");
     };
     
-    this.ut_restrictionAnd = function() {
-        var op = new Restriction(
+    this.ut_selectionAnd = function() {
+        var op = new Selection(
             new And([
                 new Predicate(function(t) { return t.get("char") === "a" } ),
                 new Predicate(function(t) { return t.get("x") < 3 } )
@@ -291,18 +291,18 @@ function TestSuite() {
             new Tuple({"char": "a", "x": 1}),
         ]);
         var actual = this.executeOp(op, UTData.chars);
-        U.expect(actual, expected, "Restriction And");
+        U.expect(actual, expected, "Selection And");
     };
     
-    this.ut_restrictionNot = function() {
-        var op = new Restriction(
+    this.ut_selectionNot = function() {
+        var op = new Selection(
             new Not(new Predicate(function(t) { return t.get("x") < 3 } ))
         );
         var expected = Factory.createRelationFromTuples("", [
             new Tuple({"char": "a", "x": 3})
         ]);
         var actual = this.executeOp(op, UTData.chars);
-        U.expect(actual, expected, "Restriction Not");
+        U.expect(actual, expected, "Selection Not");
     };
     
     this.ut_naturalJoin = function() {

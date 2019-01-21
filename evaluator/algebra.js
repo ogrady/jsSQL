@@ -257,7 +257,7 @@ function Rename(mapping) {
  * 
  * onApplied: (t, b) => t being the tuple, b being a boolean indicating whether t passed the restriction
  */ 
-function Restriction(predicate) {
+function Selection(predicate) {
     UnaryOperation.call(this);
 
     this.apply = function(t, result) {
@@ -787,7 +787,7 @@ module.exports = {
     BinaryOperation: BinaryOperation,
     GroupBy: GroupBy,
     Projection: Projection,
-    Restriction: Restriction,
+    Selection: Selection,
     Rename: Rename,
     Distinct: Distinct,
     OrderBy: OrderBy,
