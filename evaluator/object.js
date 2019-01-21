@@ -1,5 +1,5 @@
 "use strict";
-const U = require("./util.js");
+const { U } = require("./util.js");
 
 var NEXT_RID = 0;
 var NEXT_TID = 0;
