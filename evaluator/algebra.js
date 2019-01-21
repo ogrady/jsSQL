@@ -1,6 +1,7 @@
 "use strict";
 const generator = require("./generator.js");
 const { Tuple, Relation } = require("./object.js");
+const { U } = require("./util.js");
 
 /**
 * Operations are the most basic type for every Algebraic Operation.

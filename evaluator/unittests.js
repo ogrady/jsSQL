@@ -1,4 +1,34 @@
 "use strict";
+const { Factory, Tuple, Relation } = require("./object.js");
+const { U } = require("./util.js");
+const {
+    Operation,
+    UnaryOperation,
+    BinaryOperation,
+    GroupBy,
+    Projection,
+    Restriction,
+    Rename,
+    Distinct,
+    OrderBy,
+    Union,
+    Intersection,
+    Without,
+    CrossProduct,
+    EquiJoin,
+    NaturalJoin,
+    LeftJoin,
+    RightJoin,
+    FullOuterJoin,
+    LeftSemiJoin,
+    RightSemiJoin
+} = require("./algebra.js");
+const {
+    Predicate: Predicate,
+    Not: Not,
+    And: And,
+    Or: Or
+} = require("./logic.js");
 
 // DATA
 var UTData = {
@@ -374,83 +404,6 @@ function TestSuite() {
         ]);
         var actual = this.executeOp(op, UTData.persons2, UTData.persons);
         U.expect(actual, expected, "Without");
-    };
-
-
-    
-    this.ut_eatWhile = function() {
-        var l = new Lexer();
-        l.input = "hello world' + x";
-        var expected = ["hello world", "' + x"];
-        var actual = l._eatWhile(c =>  c !== "'");
-        U.expect(actual, expected[0], "Eat While Result");
-        U.expect(l.input, expected[1], "Eat While Remaining");
-    };
-    
-    this.ut_lexpect = function() {
-        var l = new Lexer();
-        l.input = "hello";
-        var expected = ["h", "ello"];
-        var actual = l._expect("h");
-        U.expect(actual, expected[0], "Lexer Expect Result");
-        U.expect(l.input, expected[1], "Lexer Expect Remaining");
-    };
-    
-    this.ut_lexpect_fail = function() {
-        var l = new Lexer();
-        l.input = "hello";
-        var expected = false;
-        try {
-            var actual = l._expect("k");
-        } catch(e) {
-            var actual = false;
-        }        
-        U.expect(actual, expected, "Lexer Expect Fail");
-    };
-    
-    this.ut_lexstring = function() {
-        var l = new Lexer();
-        l.input = "'hello world'";
-        var expected = "hello world";
-        var actual = l._lexString();
-        U.expect(actual, expected, "Lexer String");
-    };
-    
-    this.ut_lexnumber = function() {
-        var l = new Lexer();
-        l.input = "3.1425";
-        var expected = 3.1425;
-        var actual = l._lexNumber();
-        U.expect(actual, expected, "Lexer Number");
-    };
-    
-    this.ut_lexidents = function() {
-        var l = new RelationalAlgebraLexer();
-        var expected = [new TIdent("_foobar"), new TIdent("baz")];
-        var actual = l.lex("_foobar baz");
-        U.expect(actual, expected, "Lexer Idents");
-    };
-    
-    this.ut_lexnumbers = function() {
-        var l = new RelationalAlgebraLexer();
-        var input = "42.4 102 3.42 ";
-        var expected = [new TNumber(42.4), new TNumber(102.0), new TNumber(3.42)];
-        var actual = l.lex(input);
-        U.expect(actual, expected, "Lexer Number");
-    };
-    
-    this.ut_lexstrings = function() {
-        var l = new RelationalAlgebraLexer();
-        var expected = [new TString("hello"), new TString("world")];
-        var actual = l.lex("'hello' 'world'");
-        U.expect(actual, expected, "Lexer String");
-    };
-    
-    this.ut_lexspecials = function() {
-        var l = new RelationalAlgebraLexer();
-        var expected = [new TSpecial("("), new TSpecial("+")];
-        var actual = l.lex("(+");
-        U.expect(actual, expected, "Lexer Specials");
     };
 }
 

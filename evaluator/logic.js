@@ -1,4 +1,5 @@
 "use strict";
+const { U } = require("./util.js");
 
 function Predicate(p) {
     this.holds = function(t) {
