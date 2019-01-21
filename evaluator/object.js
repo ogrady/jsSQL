@@ -78,6 +78,7 @@ function Relation(name = "", schema = []) {
             }, this);
             this.pushTuple(new Tuple(d));
         }
+        return this;
     };
     
     this.schemaDisjunct = function(other) {
