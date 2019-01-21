@@ -1,4 +1,6 @@
 "use strict";
+const generator = require("./generator.js");
+const { Tuple, Relation } = require("./object.js");
 
 /**
 * Operations are the most basic type for every Algebraic Operation.
@@ -99,7 +101,7 @@ function Operation(gen) {
 */
 // abstract
 function UnaryOperation() {
-    Operation.call(this, new LinearGenerator());
+    Operation.call(this, new generator.LinearGenerator());
 
     /**
     * Executes the Unary Operation on the one operand.
@@ -126,7 +128,7 @@ function UnaryOperation() {
  */
 // abstract
 function BinaryOperation() {
-    Operation.call(this, new NestedLoopGenerator());
+    Operation.call(this, new generator.NestedLoopGenerator());
 
     /**
     * Executes the Binary Operation over the two operands R and S.
@@ -354,7 +356,7 @@ function OrderBy(attr) {
 function Union() {
     BinaryOperation.call(this);
 
-    this.generator = new BiFunnelGenerator();
+    this.generator = new generator.BiFunnelGenerator();
 
     this.apply = function(t, _, result) {
         if(!result.has(t)) {
@@ -431,7 +433,7 @@ function Without() {
     
     // LinearGenerator will work miraculously as the second relation will just be ignore in the unary set-function of the Generator.
     // So the Generator will only iterate over the first releation. 
-    this.generator = new LinearGenerator();
+    this.generator = new generator.LinearGenerator();
     this.generator._next = this.generator.next;
     this.generator.next = function() { return [this._next(), undefined] };
     
