@@ -5,7 +5,8 @@ It serves as a backend for visualisations and other frontend tools.
 The generation of single tuples as well as of whole relations can be observed via the classic visitor pattern.
 
 ## NPM
-jsSQL is built in vanilla javascript on purpose, to have a small set of dependencies and high compatibility with many browsers and versions.
+jsSQL is built in vanilla javascript on purpose, to have a small set of dependencies and high compatibility with many browsers and versions. It can therefore be used from within a browser as is shown in the `index.html` where all required files are just included as scripts.
+
 But this repository features an NPM package that wraps around the vanilla functionality.
 
 ## Known Issues

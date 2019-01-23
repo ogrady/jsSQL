@@ -112,6 +112,9 @@ function UnaryOperation() {
                       May have a different structure than the input!
     */
     this.execute = function(rs) {
+        if(rs === undefined) {
+            throw "Can not execute Unary Operation on undefined relation." 
+        }
         this.beforeExecute(rs);
         this.generator.set(rs.tuples);
         var res = this.initResult(rs);
@@ -140,6 +143,12 @@ function BinaryOperation() {
                       May have a different structure than the input!
     */
     this.execute = function(rs, ss) {
+        if(rs === undefined) {
+            throw "Can not execute Binary Operation on undefined left-hand relation." 
+        }
+        if(ss === undefined) {
+            throw "Can not execute Binary Operation on undefined right-hand relation." 
+        }
         this.beforeExecute(rs, ss);
         this.generator.set(rs.tuples, ss.tuples);
         var result = this.initResult(rs, ss);
